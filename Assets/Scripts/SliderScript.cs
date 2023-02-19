@@ -10,20 +10,13 @@ public class SliderScript : MonoBehaviour
     [SerializeField] TMP_Text sliderValue;
     [SerializeField] Slider slider;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
     public void OnSliderValueChanged()
     {
         sliderValue.text = System.Math.Round(-slider.value,2).ToString() + "°";
+    }
+
+    public void OnLevelSliderValueChanged()
+    {
+        sliderValue.text = slider.value.ToString();
     }
 }

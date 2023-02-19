@@ -11,11 +11,16 @@ public class SettingsPopup : MonoBehaviour
     [SerializeField] Slider verticalSlider;
     [SerializeField] GameObject ball;
     [SerializeField] TMP_InputField massInput;
+    [SerializeField] Slider levelSlider;
+
+    [SerializeField] TMP_Text levelSliderText;
+    
 
     // Start is called before the first frame update
     void Start()
     {
         massInput.text = ball.GetComponent<Rigidbody>().mass.ToString();     //InputField will store the initial value of cannonball mass
+        levelSliderText.text = levelSlider.value.ToString();
     }
 
     // Update is called once per frame

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class LaunchProjectile : MonoBehaviour
 {
@@ -8,6 +9,8 @@ public class LaunchProjectile : MonoBehaviour
     [SerializeField] float ThrowStrength = 20f;
     private Rigidbody projectileRb;
     [SerializeField] LineRenderer lineRenderer;
+
+    [SerializeField] Slider levelSlider;
 
     [SerializeField]
     [Range(5, 100)]
@@ -17,7 +20,6 @@ public class LaunchProjectile : MonoBehaviour
     [Range(0.01f, 1f)]
     private float TimeBetweenPoints = 0.1f;
     private float PointsPerDifficulty;
-    private int difficultyLevel = 3;
 
 
     private LayerMask GrenadeCollisionMask;
@@ -48,23 +50,24 @@ public class LaunchProjectile : MonoBehaviour
         //Debug.Log("Broadcast listener");
         Messenger.AddListener(GameEvent.OBSTACLE_HIT, DrawProjection);
     }
+
     /*void OnDisable()
     {
         Messenger.RemoveListener(GameEvent.OBSTACLE_HIT, DrawProjection);
     } */
+
     // Start is called before the first frame update
     void Start()
     {
         projectileRb = projectile.GetComponent<Rigidbody>();
+        DefineDifficulty();
         DrawProjection();
     }
 
     // Update is called once per frame
     void Update()
     {
-        //Vector3 force = transform.TransformPoint(new Vector3(0, launchVelocity, 0));
-        //DrawTrajectory.instance.UpdateTrajectory(force, projectileRb, gameObject.transform.position);
-
+ 
         if (Input.GetButtonDown("Fire1"))
         {
             GameObject ball = Instantiate(projectile, transform.position, transform.rotation);
@@ -84,7 +87,6 @@ public class LaunchProjectile : MonoBehaviour
     {
         lineRenderer.enabled = true;
         lineRenderer.positionCount = Mathf.CeilToInt(LinePoints  / TimeBetweenPoints) + 1;
-        DefineDifficulty();
         
         Vector3 startPosition = gameObject.transform.position;
         Vector3 startVelocity = ThrowStrength * gameObject.transform.up / projectileRb.mass;
@@ -116,7 +118,6 @@ public class LaunchProjectile : MonoBehaviour
 
                     lineRenderer.SetPosition(i, hit.point);
                     lineRenderer.positionCount = i + 1;
-                    Debug.Log(i);
                     return;
 
                 }
@@ -128,19 +129,29 @@ public class LaunchProjectile : MonoBehaviour
 
     public void DefineDifficulty()
     {
-        if (difficultyLevel == 0)
+        int difficultyLevel = (int) levelSlider.value;
+        Debug.Log("New difficulty is " + difficultyLevel);
+        switch (difficultyLevel)
         {
-            PointsPerDifficulty = 50;
-        }else if (difficultyLevel == 1)
-        {
-            PointsPerDifficulty = 30;
-        }else if (difficultyLevel == 2)
-        {
-            PointsPerDifficulty = 10;
-        }else if (difficultyLevel == 3)
-        {
-            PointsPerDifficulty = 7;
+            case 0:
+                PointsPerDifficulty = 50;
+                break;
+            case 1:
+                PointsPerDifficulty = 15;
+                break;
+            case 2:
+                PointsPerDifficulty = 10;
+                break;
+            case 3:
+                PointsPerDifficulty = 6;
+                break;
+            case 4:
+                PointsPerDifficulty = 3;
+                break;
+
         }
+
+        DrawProjection();
         
     }
 }
