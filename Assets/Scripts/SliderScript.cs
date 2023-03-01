@@ -10,6 +10,11 @@ public class SliderScript : MonoBehaviour
     [SerializeField] TMP_Text sliderValue;
     [SerializeField] Slider slider;
 
+    private void Start()
+    {
+        sliderValue.text = slider.value.ToString() + "°";
+    }
+
     public void OnSliderValueChanged()
     {
         sliderValue.text = System.Math.Round(-slider.value,2).ToString() + "°";

@@ -14,7 +14,7 @@ public class SettingsPopup : MonoBehaviour
     [SerializeField] Slider levelSlider;
 
     [SerializeField] TMP_Text levelSliderText;
-    
+
 
     // Start is called before the first frame update
     void Start()

@@ -9,20 +9,15 @@ public class LaunchProjectile : MonoBehaviour
     [SerializeField] float ThrowStrength = 20f;
     private Rigidbody projectileRb;
     [SerializeField] LineRenderer lineRenderer;
-
     [SerializeField] Slider levelSlider;
-
-    [SerializeField]
-    [Range(5, 100)]
-    private int LinePoints;
 
     [SerializeField]
     [Range(0.01f, 1f)]
     private float TimeBetweenPoints = 0.1f;
-    private float PointsPerDifficulty;
+    private float PointsPerDifficulty = 25;
 
 
-    private LayerMask GrenadeCollisionMask;
+    private LayerMask ProjectileCollisionMask;
     private Transform InitialParent;
     private Vector3 InitialLocalPosition;
     private Quaternion InitialRotation;
@@ -33,23 +28,17 @@ public class LaunchProjectile : MonoBehaviour
         InitialParent = projectile.transform.parent;
         InitialRotation = projectile.transform.localRotation;
         InitialLocalPosition = projectile.transform.localPosition;
-        //projectile.freezeRotation = true;
 
-        int grenadeLayer = projectile.gameObject.layer;
+        int projectileLayer = projectile.gameObject.layer;
         for (int i = 0; i < 32; i++)
         {
-            if (!Physics.GetIgnoreLayerCollision(grenadeLayer, i))
+            if (!Physics.GetIgnoreLayerCollision(projectileLayer, i))
             {
-                GrenadeCollisionMask |= 1 << i; // magic
+                ProjectileCollisionMask |= 1 << i;     //Add a layer to a layerMask
             }
         }
     }
 
-    void OnEnable()
-    {
-        //Debug.Log("Broadcast listener");
-        Messenger.AddListener(GameEvent.OBSTACLE_HIT, DrawProjection);
-    }
 
     /*void OnDisable()
     {
@@ -67,7 +56,6 @@ public class LaunchProjectile : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
- 
         if (Input.GetButtonDown("Fire1"))
         {
             GameObject ball = Instantiate(projectile, transform.position, transform.rotation);
@@ -86,51 +74,44 @@ public class LaunchProjectile : MonoBehaviour
     public void DrawProjection()
     {
         lineRenderer.enabled = true;
-        lineRenderer.positionCount = Mathf.CeilToInt(LinePoints  / TimeBetweenPoints) + 1;
+        //lineRenderer.positionCount = Mathf.CeilToInt(LinePoints  / TimeBetweenPoints) + 1;
         
         Vector3 startPosition = gameObject.transform.position;
-        Vector3 startVelocity = ThrowStrength * gameObject.transform.up / projectileRb.mass;
+        Vector3 startVelocity = ThrowStrength * gameObject.transform.up / projectileRb.mass;    //(F = ma)
         
-        float diff = PointsPerDifficulty * TimeBetweenPoints;
+        float TotalTime = PointsPerDifficulty * TimeBetweenPoints;
         lineRenderer.positionCount = Mathf.CeilToInt(PointsPerDifficulty) + 1;
 
 
         int i = 0;
-        lineRenderer.SetPosition(i, startPosition);
-        for (float time = 0; time < diff; time += TimeBetweenPoints)
+        lineRenderer.SetPosition(i, startPosition); 
+
+        for (float time = 0; time < TotalTime; time += TimeBetweenPoints)
         {
             i++;
             Vector3 point = startPosition + time * startVelocity;
-            point.y = startPosition.y + startVelocity.y * time + (Physics.gravity.y / 2f * time * time);
-
+            point.y = startPosition.y + startVelocity.y * time + (Physics.gravity.y / 2f * time * time);    // d = Uo*t + (a*t^2)/2
 
             lineRenderer.SetPosition(i, point);
             Vector3 lastPosition = lineRenderer.GetPosition(i - 1);
 
-
-         if (Physics.Raycast(lastPosition,
+             if (Physics.Raycast(lastPosition,
                     (point - lastPosition).normalized,
                     out RaycastHit hit,
                     (point - lastPosition).magnitude,
-                    GrenadeCollisionMask
-                   ))
-                {
-
+                    ProjectileCollisionMask
+                   )) {                                               //If true, the Raycast hit something
                     lineRenderer.SetPosition(i, hit.point);
                     lineRenderer.positionCount = i + 1;
                     return;
-
-                }
-
-
-        }
-        
+                }         
+        }      
     }
+
 
     public void DefineDifficulty()
     {
-        int difficultyLevel = (int) levelSlider.value;
-        Debug.Log("New difficulty is " + difficultyLevel);
+        int difficultyLevel = (int) levelSlider.value;  
         switch (difficultyLevel)
         {
             case 0:
@@ -154,4 +135,5 @@ public class LaunchProjectile : MonoBehaviour
         DrawProjection();
         
     }
+
 }

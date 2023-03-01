@@ -39,7 +39,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _Number_of_Dashes: 15
+    - _Number_of_Dashes: 5
     - _Speed: 1
     m_Colors: []
   m_BuildTextureStacks: []
